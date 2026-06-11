@@ -1,55 +1,49 @@
-//
-//  ContentView.swift
-//  ai销售
-//
-//  Created by primo on 2026/6/10.
-//
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+
+    @State private var showAddCustomerView = false
+    @State private var showAddOpportunityView = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+        NavigationStack {
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            VStack(spacing: 20) {
+
+                Image(systemName: "person.3.fill")
+                    .font(.system(size: 60))
+
+                Text("Ai Sales")
+                    .font(.largeTitle)
+                    .bold()
+
+                List {
+
+                    Label("客户管理", systemImage: "person.crop.circle")
+                    Label("跟进记录", systemImage: "note.text")
+                    Label("商机管理", systemImage: "chart.line.uptrend.xyaxis")
+
+                }
+                .frame(height: 200)
+
+                Button("➕ 新增客户") {
+                    showAddCustomerView = true
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button("➕ 新增商机") {
+                    showAddOpportunityView = true
+
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .navigationTitle("HOME")
+            .sheet(isPresented: $showAddCustomerView) {
+                AddCustomerView()
+                    }
+            .sheet(isPresented: $showAddOpportunityView) {
+                AddOpportunityView()
             }
         }
     }
@@ -57,5 +51,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
